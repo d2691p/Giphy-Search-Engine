@@ -8,7 +8,7 @@ const GifListItem = (props) => {
 	
 	return (
 		 	 <a className="single-gif">
-		 	 	<img onClick={() => onGifSelect(gif)} src={gifUrl} />
+		 	 	<img onClick={() => onGifSelect(gifUrl)} src={gifUrl} />
 			</a>
 	);
 };

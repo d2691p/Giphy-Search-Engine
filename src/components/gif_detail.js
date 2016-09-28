@@ -6,8 +6,9 @@ const GifDetail = (props) => {
 		return <div></div>;
 	}
 
-	const gifUrl = props.liveGif.images.downsized.url;
-	
+	const gifUrl = props.liveGif;
+
+
 	return(
 		<div className="col-lg-12">
 			<img id="current-gif" src={gifUrl} />

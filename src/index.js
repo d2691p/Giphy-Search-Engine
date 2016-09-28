@@ -3,12 +3,13 @@ import ReactDOM from 'react-dom';
 import SearchBar from './components/search_bar';
 import GifList from './components/gif_list';
 import GifDetail from './components/gif_detail';
-import NavBar from './components/navbar';
 import VoteButtons from './components/vote_buttons';
 import request from 'superagent';
 
-const API_KEY = "&api_key=dc6zaTOxFJmzC";
+const API_KEY = "dc6zaTOxFJmzC";
 const ROOT_URL = "http://api.giphy.com/v1/gifs/search?q=";
+const RANDOM_URL = "http://api.giphy.com/v1/gifs/random?";
+const TRENDING_URL = "http://api.giphy.com/v1/gifs/trending?";
 
 //Create a component to produce some HTML
 // Class based component is used when we need a concept of STATE
@@ -26,6 +27,8 @@ class App extends Component {
 
 		//Tell App gifSearch this is bound to App, not onSearchTermChange
 		this.gifSearch = this.gifSearch.bind(this);
+		this.randomGif = this.randomGif.bind(this);
+		this.trendingGif = this.trendingGif.bind(this);
 	}
 
 
@@ -33,33 +36,49 @@ class App extends Component {
 		//searchTerm cannot have spaces - requires '+'
 		const term = searchTerm.replace(/\s/g, '+');
 		
-		const url = `${ROOT_URL}${term}${API_KEY}`;
+		const url = `${ROOT_URL}${term}&api_key=${API_KEY}`;
 
 		request.get(url, (err, res) => {
-	      	this.setState({ gifs: res.body.data , currentGif: res.body.data[0]});
+	      	this.setState({ gifs: res.body.data , currentGif: res.body.data[0].images.downsized.url});
+	    });
+	}
+
+	randomGif(){
+		const url = `${RANDOM_URL}api_key=${API_KEY}`;
+		request.get(url, (err, res) => {
+	      	this.setState({gifs: [], currentGif: res.body.data.image_url});
+	    });
+
+	}
+
+	trendingGif(){
+		const url = `${TRENDING_URL}api_key=${API_KEY}`;
+		request.get(url, (err, res) => {
+	      	this.setState({gifs: res.body.data});
 	    });
 	}
 
 	//Passing prop videos to GifList
 	render() {
-
-		//onSearchTermChange will now be available as this.props
 		return (
-			<div>
-				<div>
-					<NavBar />
-				</div>
-				<div className="container">
-					<div className="row">
-						<SearchBar onSearchTermChange={searchTerm => this.gifSearch(searchTerm)} />
-						<GifDetail liveGif={this.state.currentGif}/>
-						<VoteButtons />
-						<GifList 
-							gifs={this.state.gifs} 
-							onGifSelect={currentGif => this.setState({currentGif})} />
+			
+			<div className="container">
+				<div className="row">
+					<div class="btn-group">
+						<button type="button" className="btn btn-primary" onClick={this.randomGif}>Random</button>
+						<button type="button" className="btn btn-primary" onClick={this.trendingGif}>Trending</button>
 					</div>
+
+					<SearchBar onSearchTermChange={searchTerm => this.gifSearch(searchTerm)} />
+
+					<GifDetail liveGif={this.state.currentGif}/>
+					
+					<GifList 
+						gifs={this.state.gifs} 
+						onGifSelect={currentGif => this.setState({currentGif})} />
 				</div>
 			</div>
+			
 		);
 	}
 }
